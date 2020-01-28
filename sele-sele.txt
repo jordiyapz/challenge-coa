@@ -1,0 +1,59 @@
+; Simple example
+; Writes Hello World to the output
+
+	JMP start
+hello: DB "Hello World!" ; Variable
+       DB 0	; String terminator
+numerator: 	DB 50		; Pembilang
+denumerator:	DB 0		; Penyebut
+errormsg: 	DB "ERROR! Divide by 0"
+	DB 0					; terminator
+
+start:	MOV D, 232	; Pointer ke output
+	MOV B, [denumerator]
+	CMP B, 0
+	JZ error
+	MOV C, 0	; Counter
+	MOV A, [numerator]
+	CALL theloop
+	DEC C
+	CMP A, 0
+	JNZ getremainder	
+	MOV B, 48
+	ADD A, B
+	MOV [D], A
+	INC D
+	ADD C, B
+	MOV [D], C
+	HLT
+
+getremainder:
+	ADD A, B
+	RET
+
+error:
+	MOV C, errormsg
+	CALL print
+	HLT
+
+theloop:
+	INC C	
+	SUB A, B
+	JA theloop
+	RET
+
+print:			; print(C:*from, D:*to)
+	PUSH A
+	PUSH B
+	MOV B, 0
+.loop:
+	MOV A, [C]	; Get char from var
+	MOV [D], A	; Write to output
+	INC C
+	INC D  
+	CMP B, [C]	; Check if end
+	JNZ .loop	; jump if not
+
+	POP B
+	POP A
+	RET
