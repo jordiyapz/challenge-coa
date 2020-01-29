@@ -1,0 +1,102 @@
+; PROGRAM Penghitung_Quotient_dan_Remainder
+
+; Deskripsi: 
+;   Mengambil 2 byte angka positif (atau pembilang nol) dari input
+;   Mengembalikan 'Q' + 2 byte angka positif berupa hasil dan sisa pembagian
+;   Atau mengembalikan E00 apabila terdapat error
+;   ke serial output
+; Langkah-langkah:
+;   Mengambil 2 byte input port 2
+;   Menghitung pembagian
+;   Output ke port4 (serial out)
+
+;Label      Mnemonik        Komentar
+;============================================================
+            JMP main        ; Mulai dari main
+
+read_input: IN  02H         ; Ambil byte dari port 2
+            RET
+
+div:                        
+; function div(B, C) -> B, C
+    ; I.S.  Terdapat 2 byte, yaitu pembilang B dan penyebut C
+    ; F.S.  Menulis Quotient ke B dan Remainder ke C     
+            PUSH D            
+            MVI D, 00H
+            MOV A, B
+
+    ;   while (B > 0) {
+    ;       B -= C;
+    ;       D++;
+    ;   }
+
+div_loop:   JZ  div_zero    
+            
+            MOV A, D
+            INR
+            MOV D, A 
+
+            MOV A, B 
+            SUB C
+            MOV B, A  
+
+            JP  div_loop    ; Ulangi jika positif
+
+    ; I.S.  B == A, A <= 0
+    ; F.S.  Kalau A negatif, maka Hasil--, Sisa += Penyebut
+div_neg:    JZ  div_zero
+            ADD C
+            MOV C, A
+            MOV A, D
+            DCR     
+            MOV B, A
+            JMP div_done     
+
+div_zero:   MOV C, B
+            MOV B, D
+
+div_done:   POP D
+            RET
+
+serial_out: 
+; procedure serial_out(A)
+    ; I.S.  Terdapat byte di A yg ingin di output scr serial 
+    ; F.S.  Mengeluarkan byte ke port4 secara serial
+            PUSH C 
+            MVI C, 08H      ; C <- 8   // Counter
+ser_loop:   OUT 04H         ; Kirim bit ke port 4
+            RAR             ; putar bit
+            DCR C           ; C--
+            JNZ ser_loop    ; Ulangi sampai C == 0       
+            POP C
+            RET 
+
+main:       CALL read_input
+            MOV B, A        ; Simpan pembilang
+            JP  part1       ; Filter positif
+            JMP error
+
+part1:      CALL read_input
+            MOV C, A        ; Simpan penyebut
+            JZ  error       ; Filter nol
+            JP  part2       ; Filter positif
+            JMP error       
+            
+part2:      CALL div
+
+            MVI A, 51H
+            CALL serial_out ; Print 'Q'
+            MOV A, B
+            CALL serial_out ; Print Hasil
+            MOV A, C
+            CALL serial_out ; Print Sisa 
+
+            JMP done
+
+error:      MVI A, 45H      
+            CALL serial_out ; Write Error Flag 'E'
+            MVI A, 00H
+            CALL serial_out
+            CALL serial_out
+
+done:       HLT
