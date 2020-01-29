@@ -1,0 +1,67 @@
+Jenis Processor yg kompatibel: 8085
+Ukuran processor: 8 bit
+Registers: {
+    A,  # Accumulator
+    B, 
+    C, 
+    D, 
+    E, 
+    H, 
+    L, 
+    SP  # 16bit
+}
+Flags: {Sign (S), Zero (Z), Parity (P), Carry (CY)}
+
+Move:
+    MOV reg1, reg2      # reg1 <- reg2
+    MVI reg, byte       # reg <- byte
+Carry:
+    STC                 # Set Carry
+    CMC                 # CoMplement the Carry
+Addition:   
+    ADD reg             # A += reg
+    ADC reg             # A += reg + CarryBit
+    ADI byte            # A += byte
+    ACI byte            # A += byte + CarryBit
+    INR                 # A++
+Subtraction:    
+    SUB reg             # A -= reg
+    SBB reg             # A -= reg + CarryBit
+    SUI byte
+    SBI byte
+    DCR                 # A--
+Rotation:
+    RAL
+    RAR
+    RLC
+    RRC
+Logic Operation:
+    ANA reg     # SAP2  # A <- A && reg 
+    ORA reg     # SAP2  # A <- A || reg     
+    XRA reg     # SAP2    
+    CMA reg     # SAP2    
+    CMP reg             # A == reg -> Z = 1, else -> Z = 0
+    CPI byte            # A == byte -> Z = 1, else -> Z = 0
+    ANI byte    # SAP2  # A <- A && byte
+    ORI byte    # SAP2  # A <- A || byte
+    XRI byte    # SAP2
+Instruksi Jump:
+    JMP address         # SAP2
+    JM  address         # SAP2
+    JZ  address         # SAP2
+    JNZ address         # SAP2
+    JP  address         # Jump if S = 0
+    JC  address         # Jump if Carry
+    JNC address         # Jump if Not Carry
+    JPE address         # Jump if Parity == 1
+    JPO address         # Jump if Parity == 0
+    CALL label  # SAP2  # Call the subroutine
+    RET         # SAP2  # Return
+Memory:
+    LDA address # SAP2  # Load Accumulator
+    STA address # SAP2  # Store Accumulator
+IO:
+    IN  portNum # SAP2  # membaca input dari port ke A 
+    OUT portNum # SAP2  # menulis output dari A ke port
+Halt:
+    HLT         # SAP2  # Halt
